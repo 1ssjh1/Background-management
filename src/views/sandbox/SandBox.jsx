@@ -10,10 +10,11 @@ import "nprogress/nprogress.css";
 
 import "./sandBox.scss";
 import { useEffect } from "react";
-
+import { connect } from "react-redux";
+import changeCollApsed from "../../redux/action-saga/TableIsCollApsed";
 const { Content } = Layout;
 
-export default function SandBox() {
+function SandBox({ isCollapsed }) {
   // 一进来就加载
   // 挂载完毕之后 就停止
   NProgress.start();
@@ -22,7 +23,7 @@ export default function SandBox() {
   });
   return (
     <Layout className="sandBox">
-      <SideMenu></SideMenu>
+      <SideMenu isCollapsed={isCollapsed}></SideMenu>
       <Layout className="site-layout">
         <TopHeader></TopHeader>
         <Content
@@ -42,3 +43,14 @@ export default function SandBox() {
     </Layout>
   );
 }
+
+const mapStateToProps = ({ CollApsedReducer: { isCollapsed } }) => {
+  return {
+    isCollapsed,
+  };
+};
+
+const mapDispatchToProps = {
+  changeCollApsed,
+};
+export default connect(mapStateToProps, mapDispatchToProps)(SandBox);

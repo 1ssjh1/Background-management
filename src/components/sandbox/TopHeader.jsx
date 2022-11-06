@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -6,12 +6,13 @@ import {
 } from "@ant-design/icons";
 import { Layout, Dropdown, Menu, Space, Avatar } from "antd";
 import { useNavigate } from "react-router-dom";
+import { connect } from "react-redux";
+
+import changeCollApsed from "../../redux/action-saga/TableIsCollApsed";
 const { Header } = Layout;
-export default function TopHeader() {
-  const [collapsed, setCollapsed] = useState(false);
+function TopHeader({ isCollapsed, changeCollApsed }) {
   // 跳转
   const navigate = useNavigate();
-
   // 右上角头像显示
   const menu = (
     <Menu
@@ -48,15 +49,18 @@ export default function TopHeader() {
       }}
     >
       {/* 创建dom方式 */}
-      {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-        className: "trigger",
-        onClick: () => setCollapsed(!collapsed),
-      })}
+      {React.createElement(
+        isCollapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
+        {
+          className: "trigger",
+          onClick: () => changeCollApsed(),
+        }
+      )}
       <div style={{ float: "right" }}>
         <span>
           欢迎 <span style={{ color: "#1890ff" }}> {username} </span> 回来
         </span>
-        <Dropdown overlay={menu}>
+        <Dropdown menu={menu}>
           <a onClick={(e) => e.preventDefault()} href="void(0)">
             <Space>
               <Avatar size={32} icon={<UserOutlined />} />
@@ -67,3 +71,14 @@ export default function TopHeader() {
     </Header>
   );
 }
+const mapStateToProps = ({ CollApsedReducer: { isCollapsed } }) => {
+  return {
+    isCollapsed,
+  };
+};
+
+const mapDispatchToProps = {
+  changeCollApsed,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopHeader);

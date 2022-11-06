@@ -46,13 +46,12 @@ const iconList = {
 //   },
 // ];
 
-export default function SideMenu() {
+export default function SideMenu({ isCollapsed }) {
   // 获取路由参数钩子
   const { pathname } = useLocation();
   // 默认 的展开项
   const openKeys = ["/" + pathname.split("/")[1]];
 
-  const [collapsed] = useState(false);
   const navigate = useNavigate();
   const [menu, setMenu] = useState([]);
 
@@ -82,7 +81,7 @@ export default function SideMenu() {
   };
   //
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
+    <Sider trigger={null} collapsible collapsed={isCollapsed}>
       <div style={{ display: "flex", height: "100%", flexDirection: "column" }}>
         <div className="logo">全球新闻管理系统</div>
         <div style={{ flex: 1, overflow: "auto" }}>

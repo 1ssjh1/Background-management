@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import HomeView from "../views/sandbox/home/HomeView";
+import { Spin } from "antd";
 import NoperMission from "../views/sandbox/nopermission/NoperMission";
+import HomeView from "../views/sandbox/home/HomeView";
 import RightList from "../views/sandbox/right-manage/RightList";
 import RoleList from "../views/sandbox/right-manage//RoleList";
 import UserList from "../views/sandbox/user-manage/UserList";
@@ -15,7 +16,8 @@ import PublishedView from "../views/sandbox/publish-manage/PublishedView";
 import SunsetView from "../views/sandbox/publish-manage/SunsetView";
 import NewsPreview from "../views/sandbox/news-manage/NewsPreview";
 import NewsUpdate from "../views/sandbox/news-manage/NewsUpdate";
-import { Navigate, useRoutes } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
+import { connect } from "react-redux";
 // 设置本地路由表 根据本地映射来渲染
 const LocalRouterMap = {
   "/home": <HomeView></HomeView>,
@@ -43,7 +45,7 @@ const LocalRouterMap = {
 //   { path: "*", element: <NoperMission></NoperMission> },
 // ];
 
-const NewRouter = () => {
+const NewRouter = ({ isLoading }) => {
   // 请求回来的动态路由 数据
   const [BackRouteList, setBackRouteList] = useState([]);
 
@@ -71,19 +73,28 @@ const NewRouter = () => {
 
   // 动态渲染出数据
   //  利用  checkRoute 检查侧边连是否有权限左  用checkuser检查 是否能通过路由进入
-  return useRoutes([
-    ...BackRouteList.filter((item) => {
-      if (checkRoute(item) && checkUserPermission(item)) return true;
-      return false;
-    }).map((item) => {
-      return {
-        path: item.key,
-        element: LocalRouterMap[item.key],
-      };
-    }),
-    { path: "", element: <Navigate to="/home" /> },
-    { path: "*", element: <NoperMission></NoperMission> },
-  ]);
+  return (
+    <Spin size="large" spinning={isLoading}>
+      {useRoutes([
+        ...BackRouteList.filter((item) => {
+          if (checkRoute(item) && checkUserPermission(item)) return true;
+          return false;
+        }).map(({ key }) => {
+          return {
+            path: key,
+            element: LocalRouterMap[key],
+          };
+        }),
+        { path: "", element: <HomeView></HomeView> },
+
+        { path: "*", element: <NoperMission></NoperMission> },
+      ])}
+    </Spin>
+  );
 };
 
-export default NewRouter;
+const mapStateToProps = ({ LoadingReducer: { isLoading } }) => {
+  return { isLoading };
+};
+
+export default connect(mapStateToProps)(NewRouter);

@@ -5,7 +5,8 @@ import LoginView from "../views/login/LoginView";
 
 // 分理出需要动态渲染的 路由
 import NewRouter from "./NewsRouter";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, useRoutes } from "react-router-dom";
+
 // export default function IndexRouter() {
 //   return useRoutes([
 //     {
@@ -41,28 +42,46 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 //   ]);
 // }
 
-export default function IndexRouter() {
+function IndexRouter() {
   return (
     <Routes>
-      <Route
-        path="/*"
-        element={
-          <AuthComponent>
-            <SandBox></SandBox>
-          </AuthComponent>
-        }
-      >
-        {/* 路由模块 */}
-        <Route path="*" element={<NewRouter></NewRouter>} />
-      </Route>
-      <Route path="/login" element={<LoginView />} />
+      <Route path="/*" element={<BaseRoute></BaseRoute>}></Route>
     </Routes>
   );
 }
+// { path: "*", element: <NoperMission></NoperMission> },
+
+const BaseRoute = () => {
+  return useRoutes([
+    {
+      path: "/*",
+      element: (
+        <AuthComponent>
+          <SandBox></SandBox>
+        </AuthComponent>
+      ),
+      children: [{ path: "*", element: <NewRouter></NewRouter> }],
+    },
+    {
+      path: "/login",
+      element: <LoginView />,
+    },
+  ]);
+};
+
 function AuthComponent({ children }) {
   return localStorage.getItem("token") ? children : <Redirect to="/login" />;
 }
 
+function Redirect({ to }) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate(to, { replace: true });
+  });
+  return null;
+}
+
+export default IndexRouter;
 // export default function IndexRouter() {
 //   return (
 //     <Routes>
@@ -106,13 +125,6 @@ function AuthComponent({ children }) {
 //判断是否有token组件
 
 // 重定向组件
-function Redirect({ to }) {
-  const navigate = useNavigate();
-  useEffect(() => {
-    navigate(to, { replace: true });
-  });
-  return null;
-}
 
 // const GetAllRoutes = () => {
 //   return useRoutes([
